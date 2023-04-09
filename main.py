@@ -26,53 +26,21 @@ def get_data():
     return data
 
 @app.get('/')
-def get_info(limit_users: int = fastapi.Query(default=None, description='Лимит пользователей'), 
-             limit_posts: int = fastapi.Query(default=None, description='Лимит постов для каждого пользователя'),
-             sort_by: str = fastapi.Query(default=None, description='Сортировка вывода по ключу'),
-             reversed: bool = fastapi.Query(default=False, description='Сортировка по убыванию')):
+def get_info(sort_by: str = fastapi.Query(default=None, description='Сортировка вывода по ключу'),
+            reversed: bool = fastapi.Query(default=False, description='Сортировка по убыванию'),
+            limit_users: int = fastapi.Query(default=None, description='Лимит пользователей'), 
+            limit_posts: int = fastapi.Query(default=None, description='Лимит постов для каждого пользователя')):
     data = get_data()
     if limit_posts != None:
         for user in data:
             user["posts"] = user["posts"][:limit_posts]
-    if limit_users != None:
-        data = data[:limit_users]
     if sort_by != None:
         try:
             data = sorted(data, key=lambda x: x[sort_by])
         except KeyError:
             return 'Ключ не найден'
+    if limit_users != None:
+        data = data[:limit_users]
     if reversed:
         data = data[::-1]
     return data
-    # order = 1
-    # if reversed:
-    #     order = -1
-    # if sort_by != None:
-    #     if sort_by == 'posts':
-    #         data[:limit_users] = sorted(data[:limit_users], key=lambda x: len(x))
-    #     else:
-    #         data[:limit_users] = sorted(data[:limit_users], key=lambda x: x[sort_by])
-    # return fastapi.encoders.jsonable_encoder(data[:limit_users])[::order]
-
-
-
-# @app.get('/users')
-# def get_users(limit: int = fastapi.Query(default=None, description='Лимит пользователей для вывода'), 
-#              sort_by: str = fastapi.Query(default=None, description='Сортировка вывода по ключу'),
-#              reversed: bool = fastapi.Query(default=False, description='Сортировка по убыванию')):
-#     data = get_json()
-#     order = 1
-#     if reversed:
-#         order = -1
-#     if sort_by != None:
-#         data[:limit] = sorted(data[:limit], key=lambda x: x[sort_by])
-#     return fastapi.encoders.jsonable_encoder(data[:limit], exclude={'posts'})[::order]
-
-# @app.get('/posts')
-# def get_posts(limit: int = fastapi.Query(default=None, description='Лимит пользователей для вывода'), 
-#              reversed: bool = fastapi.Query(default=False, description='Сортировка по убыванию')): 
-#     data = get_json()
-#     order = 1
-#     if reversed:
-#         order = -1
-#     return fastapi.encoders.jsonable_encoder(data[:limit], include={'id', 'posts'})[::order]
