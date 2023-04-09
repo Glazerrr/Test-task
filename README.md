@@ -5,12 +5,7 @@
 
 Результат работы [выглядит следующим образом](https://ibs-test-task.onrender.com/docs) и был развернут в сервисе render
 
-Решение задания состоит из 2-х частей:
-
-- Создание базы данных для хранения информации 
-- Написание самого метода
-
-Хотел бы разобрать каждую часть отдельно.
+Отдельно хотел бы разобрать структуру базы данных
 
 ### База данных
 
@@ -61,3 +56,16 @@ id | worker_id | title | description | date
 7|3|Стас поста|Lorem|2023-04-07T15:16:10+00:00
 8|3|Заголовок поста|dolor ipsum |2023-04-07T15:16:10+00:00
 9|3|поста| ipsum dolor sit amet, consectetur adipiscing elit|2023-04-07T15:16:10+00:00
+
+Далее выполняется SQL запрос который возвращает данные с 2-х таблиц
+
+```sql
+SELECT workers.*, json_group_array(json_object(
+            'title', posts.title,
+            'description', posts.description,
+            'date', posts.date
+        )) AS posts_info
+        FROM workers
+        LEFT JOIN posts ON workers.id = posts.worker_id
+        GROUP BY workers.id
+```
